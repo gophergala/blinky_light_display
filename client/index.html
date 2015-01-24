@@ -4,11 +4,15 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script>
 var tid = setInterval(mycode, 5000);
+var oldSite;
 function mycode() {
-var curUrl = $.get("http://localhost:3030/current/");
-$("#frame").attr("src", curUrl);
-};
-
+        $.get( "http://localhost:3030/current/", function ( data ) {
+                if ( data != oldSite) {
+                    $("#frame").attr("src", data);
+                    oldSite = data;
+                }
+        });
+}
 </script>
 </head>
 <body>
