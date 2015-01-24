@@ -9,7 +9,7 @@ import (
 
 //Achtung! Only manageCurrentUrl may mutate this!
 var currentUrl string = ""
-var allUrls []string = make([]string, 1)
+var allUrls []string = make([]string, 0)
 
 func main() {
 	urlsChan := make(chan []string, 100)
@@ -88,8 +88,11 @@ func manageCurrentUrl(urlsChan chan []string) {
 			thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
 			currentUrl = thisUrl
 			log.Printf("Set current url to %s\n", thisUrl)
+			time.Sleep(1 * time.Minute)
+		} else {
+			time.Sleep(1 * time.Second)
 		}
-		time.Sleep(1 * time.Minute)
+
 	}
 }
 
