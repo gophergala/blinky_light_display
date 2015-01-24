@@ -97,6 +97,7 @@ func serveCurrentUrl(w http.ResponseWriter, req *http.Request) {
 	if currentUrl == "" {
 		w.WriteHeader(404)
 	} else {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Write([]byte(currentUrl))
 	}
 }
