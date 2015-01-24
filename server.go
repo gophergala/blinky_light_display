@@ -41,5 +41,16 @@ func configure(w http.ResponseWriter, req *http.Request) {
 }
 
 func parseResourceList(resourceList string) []string {
-	return strings.Split(resourceList, "\n")
+	//TODO: Check for invalid URLs???????
+	firstPassSlice := strings.Split(resourceList, "\n")
+
+	finalSlice := make([]string, len(firstPassSlice))
+	finalSliceIndex := 0
+	for i := range firstPassSlice {
+		if firstPassSlice[i] != "" {
+			finalSlice[finalSliceIndex] = firstPassSlice[i]
+			finalSliceIndex++
+		}
+	}
+	return finalSlice[:finalSliceIndex]
 }
