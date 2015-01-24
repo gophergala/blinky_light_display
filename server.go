@@ -9,7 +9,17 @@ import (
 
 //Achtung! Only manageCurrentUrl may mutate this!
 var currentUrl string = ""
+
+//Achtung! Only configure may mutate this!
 var allUrls []string = make([]string, 0)
+
+type displayPage struct {
+	RowCount int
+	Colsizes []int
+	Rows     [][]string
+}
+
+var displayPages []displayPage = make([]displayPage, 0)
 
 func main() {
 	urlsChan := make(chan []string, 100)
@@ -61,25 +71,36 @@ func main() {
 func configure(list string, urlsChan chan []string) {
 	log.Println("configuring")
 	resourceList := list
-	allUrls = parseResourceList(resourceList)
+	displayPages = parseResourceList(resourceList)
 	log.Println("configured")
 }
 
-func parseResourceList(resourceList string) []string {
-	//TODO: Check for invalid URLs???????
-	log.Println("Parsing URLs.")
-	firstPassSlice := strings.Split(resourceList, "\n")
+func parseResourceList(resourceList string) []displayPage {
 
-	finalSlice := make([]string, len(firstPassSlice))
-	finalSliceIndex := 0
-	for i := range firstPassSlice {
-		if firstPassSlice[i] != "" {
-			finalSlice[finalSliceIndex] = firstPassSlice[i]
-			finalSliceIndex++
+	log.Println("Parsing URLs.")
+	rawPages := strings.Split(resourceList, "\n=\n")
+
+	pages := make([]displayPage, len(rawPages))
+
+	for i := range rawPages {
+		thisPage := new(displayPage)
+
+		rawRows := strings.Split(rawPages[i], "\n")
+		thisPage.RowCount = len(rawRows)
+
+		for j := range rawRows {
+			rawCols := strings.Split(rawRows[j], " | ")
+			thisPage.Colsizes[j] = len(rawCols)
+			thisPage.Rows[j] = make([]string, len(rawCols))
+
+			for k := range rawCols {
+				thisPage.Rows[j][k] = rawCols[k]
+			}
 		}
+		pages[i] = *thisPage
 	}
-	log.Printf("parsed %d urls \n", finalSliceIndex)
-	return finalSlice[:finalSliceIndex]
+
+	return pages
 }
 
 func manageCurrentUrl(urlsChan chan []string) {
