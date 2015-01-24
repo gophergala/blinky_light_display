@@ -61,7 +61,7 @@ func main() {
 func configure(list string, urlsChan chan []string) {
 	log.Println("configuring")
 	resourceList := list
-	urlsChan <- parseResourceList(resourceList)
+	allUrls = parseResourceList(resourceList)
 	log.Println("configured")
 }
 
@@ -84,18 +84,12 @@ func parseResourceList(resourceList string) []string {
 
 func manageCurrentUrl(urlsChan chan []string) {
 	for {
-		select {
-		case newUrls := <-urlsChan:
-			allUrls = newUrls
-			log.Printf("Got %d new urls \n", len(newUrls))
-		default:
-			if len(allUrls) > 0 {
-				thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
-				currentUrl = thisUrl
-				log.Printf("Set current url to %s\n", thisUrl)
-			}
-			time.Sleep(1 * time.Minute)
+		if len(allUrls) > 0 {
+			thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
+			currentUrl = thisUrl
+			log.Printf("Set current url to %s\n", thisUrl)
 		}
+		time.Sleep(1 * time.Minute)
 	}
 }
 

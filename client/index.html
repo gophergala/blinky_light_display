@@ -6,7 +6,7 @@
 var tid = setInterval(mycode, 5000);
 var oldSite;
 function mycode() {
-        $.get( "http://localhost:3030/current/", function ( data ) {
+        $.get( "/current/", function ( data ) {
                 if ( data != oldSite) {
                     $("#frame").attr("src", data);
                     oldSite = data;
