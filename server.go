@@ -9,6 +9,7 @@ import (
 
 //Achtung! Only manageCurrentUrl may mutate this!
 var currentUrl string = ""
+var allUrls []string = make([]string, 1)
 
 func main() {
 	urlsChan := make(chan []string, 100)
@@ -41,6 +42,9 @@ func main() {
 
 	//currentUrl REST endpoint
 	http.HandleFunc("/current/", serveCurrentUrl)
+
+	//allUrls REST endpoint
+	http.HandleFunc("/all/", serveAllUrls)
 
 	//Listen for connections and serve
 	log.Println("Listening...")
@@ -75,14 +79,13 @@ func parseResourceList(resourceList string) []string {
 }
 
 func manageCurrentUrl(urlsChan chan []string) {
-	urlSlice := make([]string, 1)
 	for {
 		select {
 		case newUrls := <-urlsChan:
-			urlSlice = newUrls
+			allUrls = newUrls
 			log.Printf("Got %d new urls \n", len(newUrls))
 		default:
-			thisUrl := urlSlice[time.Time.Minute(time.Now())%len(urlSlice)]
+			thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
 			currentUrl = thisUrl
 			log.Printf("Set current url to %s\n", thisUrl)
 			time.Sleep(1 * time.Minute)
@@ -96,4 +99,17 @@ func serveCurrentUrl(w http.ResponseWriter, req *http.Request) {
 	} else {
 		w.Write([]byte(currentUrl))
 	}
+}
+
+func serveAllUrls(w http.ResponseWriter, req *http.Request) {
+	w.Write([]byte(makeUrlsString(allUrls)))
+}
+
+func makeUrlsString(urls []string) string {
+	//we want a newline delimited list of urls
+	urlsString := ""
+	for i := range urls {
+		urlsString = urlsString + urls[i] + "\n"
+	}
+	return urlsString
 }
