@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>
+var tid = setInterval(mycode, 5000);
+var site = 1;
+function mycode() {
+if ( site == 1) {
+$("#frame").attr("src", "http://en.wikipedia.org");
+site = 2;
+}
+else {
+$("#frame").attr("src", "http://hackaday.com");
+site = 1;
+}
+};
+</script>
+</head>
+<body>
+<iframe id="frame" width="100%" height="800" src="http://pumpingstationone.org"></iframe>
+</body>
+</html>
+
