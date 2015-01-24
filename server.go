@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -22,6 +23,23 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
 
+	//configuration REST endpoint
+	http.HandleFunc("/configure/", configure)
+
+	//Listen for connections and serve
 	log.Println("Listening...")
-	http.ListenAndServe(":3030", nil)
+	err := http.ListenAndServe(":3030", nil)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func configure(w http.ResponseWriter, req *http.Request) {
+	resourceList := req.FormValue("list")
+	parseResourceList(resourceList)
+	w.Write([]byte("Success!  http://localhost:3030/config.html"))
+}
+
+func parseResourceList(resourceList string) []string {
+	return strings.Split(resourceList, "\n")
 }
