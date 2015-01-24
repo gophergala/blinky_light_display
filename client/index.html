@@ -4,17 +4,11 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script>
 var tid = setInterval(mycode, 5000);
-var site = 1;
 function mycode() {
-if ( site == 1) {
-$("#frame").attr("src", "http://en.wikipedia.org");
-site = 2;
-}
-else {
-$("#frame").attr("src", "http://hackaday.com");
-site = 1;
-}
+var curUrl = $.get("http://localhost:3030/current/");
+$("#frame").attr("src", curUrl);
 };
+
 </script>
 </head>
 <body>
