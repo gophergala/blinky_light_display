@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
+	urlsChan := make(chan []string, 100)
+
 	//Serve static configuration page
 	//  GET config.html
 	//	GET client whatnot
@@ -24,7 +26,11 @@ func main() {
 	http.Handle("/", fs)
 
 	//configuration REST endpoint
-	http.HandleFunc("/configure/", configure)
+	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
+		log.Println("Recieved post request.")
+		configure(req.FormValue("list"), urlsChan)
+		w.Write([]byte("Success!  http://localhost:3030/config.html"))
+	})
 
 	//Listen for connections and serve
 	log.Println("Listening...")
@@ -34,14 +40,16 @@ func main() {
 	}
 }
 
-func configure(w http.ResponseWriter, req *http.Request) {
-	resourceList := req.FormValue("list")
-	parseResourceList(resourceList)
-	w.Write([]byte("Success!  http://localhost:3030/config.html"))
+func configure(list string, urlsChan chan []string) {
+	log.Println("configuring")
+	resourceList := list
+	urlsChan <- parseResourceList(resourceList)
+	log.Println("configured")
 }
 
 func parseResourceList(resourceList string) []string {
 	//TODO: Check for invalid URLs???????
+	log.Println("Parsing URLs.")
 	firstPassSlice := strings.Split(resourceList, "\n")
 
 	finalSlice := make([]string, len(firstPassSlice))
@@ -52,5 +60,6 @@ func parseResourceList(resourceList string) []string {
 			finalSliceIndex++
 		}
 	}
+	log.Printf("parsed %d urls", finalSliceIndex)
 	return finalSlice[:finalSliceIndex]
 }
