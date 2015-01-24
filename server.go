@@ -4,7 +4,11 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
+
+//Achtung! Only manageCurrentUrl may mutate this!
+var currentUrl string = ""
 
 func main() {
 	urlsChan := make(chan []string, 100)
@@ -21,9 +25,12 @@ func main() {
 	//	Respond w/ text/plain uri
 	//	If none, 404? 500? I guess 404
 
+	//start managing the current url
+	go manageCurrentUrl(urlsChan)
+
 	//static file server
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/", fs)
+	configfs := http.FileServer(http.Dir("."))
+	http.Handle("/", configfs)
 
 	//configuration REST endpoint
 	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
@@ -31,6 +38,9 @@ func main() {
 		configure(req.FormValue("list"), urlsChan)
 		w.Write([]byte("Success!  http://localhost:3030/config.html"))
 	})
+
+	//currentUrl REST endpoint
+	http.HandleFunc("/current/", serveCurrentUrl)
 
 	//Listen for connections and serve
 	log.Println("Listening...")
@@ -60,6 +70,30 @@ func parseResourceList(resourceList string) []string {
 			finalSliceIndex++
 		}
 	}
-	log.Printf("parsed %d urls", finalSliceIndex)
+	log.Printf("parsed %d urls \n", finalSliceIndex)
 	return finalSlice[:finalSliceIndex]
+}
+
+func manageCurrentUrl(urlsChan chan []string) {
+	urlSlice := make([]string, 1)
+	for {
+		select {
+		case newUrls := <-urlsChan:
+			urlSlice = newUrls
+			log.Printf("Got %d new urls \n", len(newUrls))
+		default:
+			thisUrl := urlSlice[time.Time.Minute(time.Now())%len(urlSlice)]
+			currentUrl = thisUrl
+			log.Printf("Set current url to %s\n", thisUrl)
+			time.Sleep(1 * time.Minute)
+		}
+	}
+}
+
+func serveCurrentUrl(w http.ResponseWriter, req *http.Request) {
+	if currentUrl == "" {
+		w.WriteHeader(404)
+	} else {
+		w.Write([]byte(currentUrl))
+	}
 }
