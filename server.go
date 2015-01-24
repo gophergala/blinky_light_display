@@ -29,10 +29,6 @@ func main() {
 	//start managing the current url
 	go manageCurrentUrl(urlsChan)
 
-	//static file server
-	configfs := http.FileServer(http.Dir("."))
-	http.Handle("/", configfs)
-
 	//configuration REST endpoint
 	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
 		log.Println("Recieved post request.")
@@ -45,6 +41,14 @@ func main() {
 
 	//allUrls REST endpoint
 	http.HandleFunc("/all/", serveAllUrls)
+
+	//static file server
+	// configfs := http.FileServer(http.Dir("static/"))
+	// http.Handle("/config/", configfs)
+
+	//static file server
+	clientfs := http.FileServer(http.Dir("client"))
+	http.Handle("/", clientfs)
 
 	//Listen for connections and serve
 	log.Println("Listening...")
@@ -85,9 +89,11 @@ func manageCurrentUrl(urlsChan chan []string) {
 			allUrls = newUrls
 			log.Printf("Got %d new urls \n", len(newUrls))
 		default:
-			thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
-			currentUrl = thisUrl
-			log.Printf("Set current url to %s\n", thisUrl)
+			if len(allUrls) > 0 {
+				thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
+				currentUrl = thisUrl
+				log.Printf("Set current url to %s\n", thisUrl)
+			}
 			time.Sleep(1 * time.Minute)
 		}
 	}
