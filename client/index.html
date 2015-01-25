@@ -5,8 +5,8 @@
     <style>
 div iframe {
     display:block;
-    height:300px;
     width:100%;
+    height:100%;
 }
 div {
     float:left;
@@ -16,7 +16,9 @@ div {
 var layout;
 var layoutPrev;
 function mycode() {
-    $.get("http:///localhost:3030/current/", function(data) {
+	var winHeight = $(window).height(); 
+
+    $.get("/current/", function(data) {
         if( data != layoutPrev) {
             layout = JSON.parse(data);
             layoutPrev = data;
@@ -27,6 +29,8 @@ function mycode() {
               var cW = ($(window).width() / layout.Colsizes[i]);
               cW -= 18;
                  $("div#"+i+j).width(cW);
+                 $("div").height(winHeight / layout.RowCount);
+                 $("iframe").height(winHeight / layout.RowCount);
                 }
             }
         }
