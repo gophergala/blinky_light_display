@@ -13,19 +13,27 @@ div {
 }
     </style>
 <script>
+var layout;
+var layoutPrev;
 function mycode() {
-    var layout = JSON.parse("http://localhost:3030/current/");
-
-    for (var i = 0; i < layout.RowCount; i++) {
-        for (var j = 0; j < layout.Colsizes[i]; j++) {
-            $("body").append("<div id=" + i + j + "><iframe id=r" + j + " src=" + layout.Rows[i][j] + " scrolling=no></iframe></div>");
-            var cW = ($(window).width() / layout.Colsizes[i]);
-            cW -= 18;
-            $("div#"+i+j).width(cW);
+    $.get("http:///localhost:3030/current/", function(data) {
+        if( data != layoutPrev) {
+            layout = JSON.parse(data);
+            layoutPrev = data;
+            $("body").empty();
+            for (var i = 0; i < layout.RowCount; i++) {
+             for (var j = 0; j < layout.Colsizes[i]; j++) {
+              $("body").append("<div id=" + i + j + "><iframe id=r" + j + " src=" + layout.Rows[i][j] + " scrolling=no></iframe></div>");
+              var cW = ($(window).width() / layout.Colsizes[i]);
+              cW -= 18;
+                 $("div#"+i+j).width(cW);
+                }
             }
-    }
+        }
+    });
+
 }
-var tid = setInterval(mycode, 20000);
+var tid = setInterval(mycode, 2000);
 </script>
 </head>
 <body>
