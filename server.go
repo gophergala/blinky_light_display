@@ -1,17 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 )
-
-//Achtung! Only manageCurrentUrl may mutate this!
-var currentUrl string = ""
-
-//Achtung! Only configure may mutate this!
-var allUrls []string = make([]string, 0)
 
 type displayPage struct {
 	RowCount int
@@ -19,30 +14,19 @@ type displayPage struct {
 	Rows     [][]string
 }
 
+var displayPagesString string = ""
 var displayPages []displayPage = make([]displayPage, 0)
+var currentPage displayPage = *new(displayPage)
 
 func main() {
-	urlsChan := make(chan []string, 100)
-
-	//Serve static configuration page
-	//  GET config.html
-	//	GET client whatnot
-	//Serve configuration REST endpoint
-	//	PUT /configuration/ {list of assets}
-	//	Parse asset list
-	//	Respond appropriately
-	//Serve current display item uri
-	//	GET /current/
-	//	Respond w/ text/plain uri
-	//	If none, 404? 500? I guess 404
 
 	//start managing the current url
-	go manageCurrentUrl(urlsChan)
+	go manageCurrentUrl()
 
 	//configuration REST endpoint
 	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
 		log.Println("Recieved post request.")
-		configure(req.FormValue("list"), urlsChan)
+		configure(req.FormValue("list"))
 		w.Write([]byte("Success!  http://localhost:3030/config.html"))
 	})
 
@@ -51,10 +35,6 @@ func main() {
 
 	//allUrls REST endpoint
 	http.HandleFunc("/all/", serveAllUrls)
-
-	//static file server
-	// configfs := http.FileServer(http.Dir("static/"))
-	// http.Handle("/config/", configfs)
 
 	//static file server
 	clientfs := http.FileServer(http.Dir("client"))
@@ -68,73 +48,60 @@ func main() {
 	}
 }
 
-func configure(list string, urlsChan chan []string) {
+func configure(list string) {
 	log.Println("configuring")
-	resourceList := list
-	displayPages = parseResourceList(resourceList)
-	log.Println("configured")
+	displayPagesString = list
+	displayPages = parseResourceList(displayPagesString)
 }
 
 func parseResourceList(resourceList string) []displayPage {
 
 	log.Println("Parsing URLs.")
+	resourceList = strings.Replace(resourceList, "\r", "", -1)
+
 	rawPages := strings.Split(resourceList, "\n=\n")
 
 	pages := make([]displayPage, len(rawPages))
 
 	for i := range rawPages {
 		thisPage := new(displayPage)
-
 		rawRows := strings.Split(rawPages[i], "\n")
 		thisPage.RowCount = len(rawRows)
-
+		thisPage.Colsizes = make([]int, len(rawRows))
+		thisPage.Rows = make([][]string, len(rawRows))
 		for j := range rawRows {
 			rawCols := strings.Split(rawRows[j], " | ")
 			thisPage.Colsizes[j] = len(rawCols)
 			thisPage.Rows[j] = make([]string, len(rawCols))
-
 			for k := range rawCols {
 				thisPage.Rows[j][k] = rawCols[k]
 			}
 		}
 		pages[i] = *thisPage
 	}
-
 	return pages
 }
 
-func manageCurrentUrl(urlsChan chan []string) {
+func manageCurrentUrl() {
 	for {
-		if len(allUrls) > 0 {
-			thisUrl := allUrls[time.Time.Minute(time.Now())%len(allUrls)]
-			currentUrl = thisUrl
-			log.Printf("Set current url to %s\n", thisUrl)
+		if len(displayPages) > 0 {
+			thisPage := displayPages[time.Time.Minute(time.Now())%len(displayPages)]
+			currentPage = thisPage
+			log.Printf("Set current url to %s\n", thisPage)
 			time.Sleep(1 * time.Minute)
 		} else {
 			time.Sleep(1 * time.Second)
 		}
-
 	}
 }
 
 func serveCurrentUrl(w http.ResponseWriter, req *http.Request) {
-	if currentUrl == "" {
-		w.WriteHeader(404)
-	} else {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Write([]byte(currentUrl))
-	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	urlJson, _ := json.Marshal(currentPage)
+	w.Write(urlJson)
+
 }
 
 func serveAllUrls(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte(makeUrlsString(allUrls)))
-}
-
-func makeUrlsString(urls []string) string {
-	//we want a newline delimited list of urls
-	urlsString := ""
-	for i := range urls {
-		urlsString = urlsString + urls[i] + "\n"
-	}
-	return urlsString
+	w.Write([]byte(displayPagesString))
 }
