@@ -17,8 +17,10 @@ The current known-good configuration is:
 	=
 	http://forecast.io/embed/#lat=41.8915&lon=-87.6146&name=Chicago&color=#00aaff&font=Georgia&units=us | http://www.cityofchicago.org/city/en/depts/mayor/iframe/plow_tracker.html
 	=
-	http://time.com/newsfeed/
-	http://edition.cnn.com/?hpt=header_edition-picker | http://www.foxnews.com | http://www.msnbc.com/
+	http://www.theonion.com | http://edition.cnn.com/?hpt=header_edition-picker
+	http://www.foxnews.com | http://www.msnbc.com/
+	=
+	http://comeonandsl.am/
 
 
 Usage
