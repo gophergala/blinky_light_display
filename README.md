@@ -15,9 +15,9 @@ The current known-good configuration is:
 	http://sshchicago.org | http://pumpingstationone.org
 	https://www.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23FFFFFF&src=ssh%40sshchicago.org&color=%23B1440E&ctz=America%2FChicago | https://www.google.com/calendar/embed?mode=AGENDA&height=600&wkst=1&bgcolor=%23FFFFFF&src=hhlp4gcgvdmifq5lcbk7e27om4%40group.calendar.google.com&color=%23A32929&ctz=America%2FChicago
 	=
-	http://forecast.io/embed/#lat=41.8915&lon=-87.6146&name=Downtown Chicago&color=#00aaff&font=Georgia&units=us | http://www.cityofchicago.org/city/en/depts/mayor/iframe/plow_tracker.html
+	http://forecast.io/embed/#lat=41.8915&lon=-87.6146&name=Chicago&color=#00aaff&font=Georgia&units=us | http://www.cityofchicago.org/city/en/depts/mayor/iframe/plow_tracker.html
 	=
-	https://twitter.com/hashtag/gophergala?f=realtime&src=hash
+	http://time.com/newsfeed/
 	http://edition.cnn.com/?hpt=header_edition-picker | http://www.foxnews.com | http://www.msnbc.com/
 
 
