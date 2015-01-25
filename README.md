@@ -3,13 +3,31 @@ A golang-based digital signage server.
 
 The goal of this project is a simple, easy-to-implement digital signage server that can be utilized with nothing more than a web browser on the client side.
 
+Example
+=======
+
+Head to http://agocs.org:3030/ to see this thing running live!
+
+Check out http://agocs.org:3030/config.html to play with the configuration. Changes you make affect everybody, so be nice. If someone does something objectionable or you need help configuring it, email me. chris@agocs.org.
+
+The current known-good configuration is:
+
+	http://sshchicago.org | http://pumpingstationone.org
+	https://www.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23FFFFFF&src=ssh%40sshchicago.org&color=%23B1440E&ctz=America%2FChicago | https://www.google.com/calendar/embed?mode=AGENDA&height=600&wkst=1&bgcolor=%23FFFFFF&src=hhlp4gcgvdmifq5lcbk7e27om4%40group.calendar.google.com&color=%23A32929&ctz=America%2FChicago
+	=
+	http://forecast.io/embed/#lat=41.8915&lon=-87.6146&name=Downtown Chicago&color=#00aaff&font=Georgia&units=us | http://www.cityofchicago.org/city/en/depts/mayor/iframe/plow_tracker.html
+	=
+	https://twitter.com/hashtag/gophergala?f=realtime&src=hash
+	http://edition.cnn.com/?hpt=header_edition-picker | http://www.foxnews.com | http://www.msnbc.com/
+
+
 Usage
 ===
 The server runs, by default, on port 3030 of your host.
 
-The configuration page lives at <server root>/config.html and allows you to enter a series of newline-delimited URLS. There'll a pause up to a minute long before the server begins providing these URLs.
+The configuration page lives at <server root>/config.html and allows you to enter a series of URLS in a layout language defined below. There may be a pause of up to a minute long before the server begins providing these URLs.
 
-The client lives at the server root, and is simply a full-page iframe that serves up whatever the current page delivered by the server is. The border and scrollbar has been removed - pages that do not require scrolling are currently required.
+The client lives at the server root, and is simply a small amount of javascript that loads your pages to display in iframes. The border and scrollbar has been removed - pages that do not require scrolling are currently required.
 
 Page Layout DSL
 ===============
