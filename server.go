@@ -27,7 +27,7 @@ func main() {
 	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
 		log.Println("Recieved post request.")
 		configure(req.FormValue("list"))
-		w.Write([]byte("Success!  http://localhost:3030/config.html"))
+		w.Write([]byte("Success!  http://localhost:8080/config.html"))
 	})
 
 	//currentUrl REST endpoint
@@ -42,7 +42,7 @@ func main() {
 
 	//Listen for connections and serve
 	log.Println("Listening...")
-	err := http.ListenAndServe(":3030", nil)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Println(err.Error())
 	}
