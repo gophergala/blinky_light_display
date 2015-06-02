@@ -32,9 +32,14 @@ func main() {
 
 	//configuration REST endpoint
 	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
-		log.Println("Recieved post request.")
-		configure(req.FormValue("list"), true)
-		w.Write([]byte("Success!  http://localhost:3030/config.html"))
+		if req.Method == "POST" {
+			log.Println("Recieved post request.")
+			configure(req.FormValue("list"), true)
+			w.Write([]byte("Success!  http://localhost:3030/config.html"))
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte("Quit being a nudge, Spew."))
+		}
 	})
 
 	//currentUrl REST endpoint
