@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -20,13 +21,19 @@ var currentPage displayPage = *new(displayPage)
 
 func main() {
 
+	//Attempt to read configuration file
+	data, err := ioutil.ReadFile("conf.txt")
+	if err == nil {
+		configure(string(data), false)
+	}
+
 	//start managing the current url
 	go manageCurrentUrl()
 
 	//configuration REST endpoint
 	http.HandleFunc("/configure/", func(w http.ResponseWriter, req *http.Request) {
 		log.Println("Recieved post request.")
-		configure(req.FormValue("list"))
+		configure(req.FormValue("list"), true)
 		w.Write([]byte("Success!  http://localhost:3030/config.html"))
 	})
 
@@ -42,14 +49,18 @@ func main() {
 
 	//Listen for connections and serve
 	log.Println("Listening...")
-	err := http.ListenAndServe(":3030", nil)
-	if err != nil {
+	err2 := http.ListenAndServe(":3030", nil)
+	if err2 != nil {
 		log.Println(err.Error())
 	}
 }
 
-func configure(list string) {
+func configure(list string, fromWeb bool) {
 	log.Println("configuring")
+	if fromWeb {
+		data := []byte(list)
+		ioutil.WriteFile("conf.txt", data, 0644)
+	}
 	displayPagesString = list
 	displayPages = parseResourceList(displayPagesString)
 }
